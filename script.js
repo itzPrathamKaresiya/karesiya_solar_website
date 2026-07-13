@@ -118,7 +118,7 @@ checkAndStartCounters();
 // ========================
 function addRevealClasses() {
   const targets = document.querySelectorAll(
-    '.stat-card, .service-card, .why-feature, .cert-card, .process-step, .testimonial-card, .extra-service-item, .lead-benefit'
+    '.stat-card, .about-content, .team-card, .service-card, .why-feature, .cert-card, .process-step, .testimonial-card, .extra-service-item, .lead-benefit'
   );
   targets.forEach((el, i) => {
     el.classList.add('reveal');
@@ -327,15 +327,36 @@ if (form) {
     btnLoader.classList.remove('hidden');
     submitBtn.disabled = true;
 
-    // Simulate API call (replace with actual endpoint)
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    // Prepare data to send to the custom email via Web3Forms
+    const formData = new FormData(form);
+    // Replace "YOUR_ACCESS_KEY_HERE" with your free access key from https://web3forms.com/
+    formData.append("access_key", "60c17ba5-03ca-443f-b6bd-7046b128fa82");
 
-    // Show success
-    form.classList.add('hidden');
-    formSuccess.classList.remove('hidden');
-    submitBtn.disabled = false;
-    btnText.classList.remove('hidden');
-    btnLoader.classList.add('hidden');
+    try {
+      // Send the request to Web3Forms API
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        body: formData
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Show success message
+        form.classList.add('hidden');
+        formSuccess.classList.remove('hidden');
+      } else {
+        alert("There was an error sending your request. Please try again.");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Something went wrong. Please check your connection and try again.");
+    } finally {
+      // Re-enable button
+      submitBtn.disabled = false;
+      btnText.classList.remove('hidden');
+      btnLoader.classList.add('hidden');
+    }
 
     // Scroll to form
     document.getElementById('lead-form').scrollIntoView({ behavior: 'smooth', block: 'center' });
